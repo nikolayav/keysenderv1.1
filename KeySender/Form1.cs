@@ -1,16 +1,29 @@
 ﻿using SnagFree.TrayApp.Core;
 using System;
-using System.Text;
 using System.Windows.Forms;
-using System.Windows.Input;
+
 
 namespace KeySender {
     public partial class Form1 : Form {
         public Form1() {
             InitializeComponent();
         }
+
+        string usageInfo = "Name: Key Sender\n" +
+                               "Version: 1.0\n" +
+                               "Author: Nikolay Avroniev\n\n" +
+                               "Description: A simple application that sends individual keystrokes to an external textfield.\n\n" +
+
+                               "Usage:\n" +
+                               "1. Type the text you need copied in the textbox field. \n" +
+                               "2. Select a destination text field. \n" +
+                               "3. Press \"Right-Ctrl\" button.";
+
         private GlobalKeyboardHook _globalKeyboardHook;
+
         private void Form1_Load(object sender, EventArgs e) {
+            
+
             _globalKeyboardHook = new GlobalKeyboardHook();
             _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
         }
@@ -26,10 +39,6 @@ namespace KeySender {
                     }
                 }
             }
-        }
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e) {
-         
         }
 
         private void SendText() {
@@ -59,17 +68,6 @@ namespace KeySender {
         }
 
         private void AboutToolstripButton_Click(object sender, EventArgs e) {
-            
-            string usageInfo = "Name: Key Sender\n" +
-                               "Version: 1.0\n" +
-                               "Author: Nikolay Avroniev\n\n" +
-                               "Description: A simple application that sends individual keystrokes to an external textfield.\n\n" +
-                               
-                               "Usage:\n" +
-                               "1. Type the text you need copied in the textbox field. \n" +
-                               "2. Select a destination text field. \n" +
-                               "3. Press \"Right-Ctrl\" button.";
-           
             MessageBox.Show(usageInfo, "About", MessageBoxButtons.OK, MessageBoxIcon.None);
             
         }
