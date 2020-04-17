@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>keyboard-2-24.ico</ApplicationIcon>
+    <ApplicationIcon>appicon-16.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalKeyboardHook.cs" />
-    <Compile Include="NativeWin32.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -72,6 +71,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -87,10 +87,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icons8-Ios7-Computer-Hardware-Keyboard.ico" />
-    <Content Include="keyboard-2-16.ico" />
-    <Content Include="keyboard-2-24.ico" />
-    <Content Include="keyboard-2-256.ico" />
+    <Content Include="appicon-16.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

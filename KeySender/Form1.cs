@@ -1,5 +1,6 @@
 ﻿using SnagFree.TrayApp.Core;
 using System;
+using System.Text;
 using System.Windows.Forms;
 
 
@@ -7,45 +8,53 @@ namespace KeySender {
     public partial class Form1 : Form {
         public Form1() {
             InitializeComponent();
+            _globalKeyboardHook = new GlobalKeyboardHook();
+            _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
         }
 
-        string usageInfo = "Name: Key Sender\n" +
-                               "Version: 1.0\n" +
+        string usageInfo =     "Name: Key Sender\n" +
+                               "Version: 1.1\n" +
                                "Author: Nikolay Avroniev\n\n" +
                                "Description: A simple application that sends individual keystrokes to an external textfield.\n\n" +
-
                                "Usage:\n" +
-                               "1. Type the text you need copied in the textbox field. \n" +
-                               "2. Select a destination text field. \n" +
-                               "3. Press \"Right-Ctrl\" button.";
+                               "1. Copy text in your clipboard. \n" +
+                               "2. Press \"Right-Ctrl\" button in a text field.";
 
         private GlobalKeyboardHook _globalKeyboardHook;
 
         private void Form1_Load(object sender, EventArgs e) {
-            
-
-            _globalKeyboardHook = new GlobalKeyboardHook();
-            _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
+            this.Hide();
+            this.ShowInTaskbar = false;
+            notifyIcon1.Icon = this.Icon;
+            notifyIcon1.Visible = true;
         }
 
         private void OnKeyPressed(object sender, GlobalKeyboardHookEventArgs e) {
             if (e.KeyboardState == GlobalKeyboardHook.KeyboardState.KeyUp) {
                 //detect a right-ctrl key-up
                 if ((e.KeyboardData.HardwareScanCode == 29) && (e.KeyboardData.VirtualCode == 163)) {
-                    IntPtr windowdHandle = NativeWin32.GetForegroundWindow();
-                    //If the foreground window is this application (Key Sender) then ignore it.
-                    if (!windowdHandle.Equals(this.Handle)) {
-                        tmrSendKeys.Start();
-                    }
+                    tmrSendKeys.Start();
                 }
             }
         }
 
         private void SendText() {
-            char[] specialChars = { '{', '}', '(', ')', '+', '^' };
-            string str = richTextBox1.Text;
 
-            foreach (char letter in str) {
+            string clipboardText;
+            IDataObject iData = Clipboard.GetDataObject();
+            if (iData.GetDataPresent(DataFormats.Text)) {
+                clipboardText = (String)iData.GetData(DataFormats.Text);
+            } else {
+                return;
+            }
+
+            // remove excess new lines
+            clipboardText = clipboardText.Replace("\r\n", "\r").Replace("\n", "\r");
+            StringBuilder sb = new StringBuilder();
+
+            char[] specialChars = { '{', '}', '(', ')', '+', '^' };
+
+            foreach (char letter in clipboardText) {
                 bool isSpecialChar = false;
 
                 for (int i = 0; i < specialChars.Length; i++) {
@@ -56,10 +65,12 @@ namespace KeySender {
                 }
 
                 if (isSpecialChar)
-                    SendKeys.Send("{" + letter.ToString() + "}");
+                    sb.Append("{" + letter.ToString() + "}");
                 else
-                    SendKeys.Send(letter.ToString());
+                    sb.Append(letter.ToString());
             }
+            SendKeys.Send(sb.ToString());
+            
         }
 
         private void tmrSendKeys_Tick(object sender, EventArgs e) {
@@ -67,9 +78,13 @@ namespace KeySender {
             SendText();
         }
 
-        private void AboutToolstripButton_Click(object sender, EventArgs e) {
+        private void mnuExit_Click(object sender, EventArgs e) {
+            notifyIcon1.Visible = false;
+            this.Close();
+        }
+
+        private void mnuAbout_Click(object sender, EventArgs e) {
             MessageBox.Show(usageInfo, "About", MessageBoxButtons.OK, MessageBoxIcon.None);
-            
         }
     }
 }
