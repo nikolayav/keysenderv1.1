@@ -1,5 +1,6 @@
 ﻿using SnagFree.TrayApp.Core;
 using System;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -11,14 +12,6 @@ namespace KeySender {
             _globalKeyboardHook = new GlobalKeyboardHook();
             _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
         }
-
-        string usageInfo =     "Name: Key Sender\n" +
-                               "Version: 1.1\n" +
-                               "Author: Nikolay Avroniev\n\n" +
-                               "Description: A simple application that sends individual keystrokes to an external textfield.\n\n" +
-                               "Usage:\n" +
-                               "1. Copy text in your clipboard. \n" +
-                               "2. Press \"Right-Ctrl\" button in a text field.";
 
         private GlobalKeyboardHook _globalKeyboardHook;
 
@@ -49,9 +42,8 @@ namespace KeySender {
             }
 
             // remove excess new lines
-            clipboardText = clipboardText.Replace("\r\n", "\r").Replace("\n", "\r");
-            StringBuilder sb = new StringBuilder();
-
+            clipboardText = clipboardText.Replace("\r\n\r\n", "\n").Replace("\r\n", "\n");
+            
             char[] specialChars = { '{', '}', '(', ')', '+', '^' };
 
             foreach (char letter in clipboardText) {
@@ -65,12 +57,10 @@ namespace KeySender {
                 }
 
                 if (isSpecialChar)
-                    sb.Append("{" + letter.ToString() + "}");
+                    SendKeys.Send("{" + letter.ToString() + "}");
                 else
-                    sb.Append(letter.ToString());
-            }
-            SendKeys.Send(sb.ToString());
-            
+                    SendKeys.Send(letter.ToString());
+            }    
         }
 
         private void tmrSendKeys_Tick(object sender, EventArgs e) {
@@ -84,7 +74,11 @@ namespace KeySender {
         }
 
         private void mnuAbout_Click(object sender, EventArgs e) {
-            MessageBox.Show(usageInfo, "About", MessageBoxButtons.OK, MessageBoxIcon.None);
+            using (CustomMsgBox.CustomMessageBox infoMsg = new CustomMsgBox.CustomMessageBox()) {
+                Image img = Properties.Resources.msgBoxImage.ToBitmap();
+                infoMsg.Init("KeySender v1.1", "Auto-types from clipboard to any textfield", "1. Copy text to your clipboard\n2. Select a textfield\n3. Press Right-Ctrl button to auto-type the text", "Author: Nikolay Avroniev", "Close", img);
+                infoMsg.ShowDialog(this);
+            };
         }
     }
 }
